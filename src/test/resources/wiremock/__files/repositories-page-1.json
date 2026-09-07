@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1296269,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+    "name": "hello-world",
+    "full_name": "octocat/hello-world",
+    "private": false,
+    "owner": {
+      "login": "octocat",
+      "id": 583231,
+      "type": "User"
+    },
+    "html_url": "https://github.com/octocat/hello-world",
+    "description": "My first repository on GitHub",
+    "fork": false,
+    "default_branch": "main",
+    "visibility": "public"
+  },
+  {
+    "id": 132464395,
+    "node_id": "MDEwOlJlcG9zaXRvcnkxMzI0NjQzOTU=",
+    "name": "linux",
+    "full_name": "octocat/linux",
+    "private": false,
+    "owner": {
+      "login": "octocat",
+      "id": 583231,
+      "type": "User"
+    },
+    "html_url": "https://github.com/octocat/linux",
+    "description": "Linux kernel source tree",
+    "fork": true,
+    "default_branch": "master",
+    "visibility": "public"
+  }
+]
