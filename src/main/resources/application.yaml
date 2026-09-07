@@ -1,3 +1,7 @@
 spring:
   application:
     name: github-repos-api
+
+github:
+  # Optional. Without a token GitHub allows 60 requests per hour, with one it allows 5000
+  token: ${GITHUB_TOKEN:}
