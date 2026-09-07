@@ -1,0 +1,155 @@
+openapi: 3.1.0
+info:
+  title: GitHub repositories API
+  description: "Reports the repositories a GitHub user owns, forks excluded, together\
+    \ with the branches of each repository and the last commit on every branch."
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+tags:
+- name: Repositories
+  description: Repositories owned by a GitHub user
+paths:
+  /api/v1/users/{username}/repositories:
+    get:
+      tags:
+      - Repositories
+      summary: List the repositories of a user
+      description: "Returns the repositories the user owns, forks excluded, each with\
+        \ all of its branches and the last commit on every branch."
+      operationId: listRepositories
+      parameters:
+      - name: username
+        in: path
+        description: GitHub login of the account that owns the repositories
+        required: true
+        schema:
+          type: string
+          pattern: "[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}"
+        example: octocat
+      responses:
+        "200":
+          description: "Repositories of the user, empty if there are none"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Repository"
+        "400":
+          description: The user name is not a valid GitHub login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "404":
+          description: No such GitHub user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "406":
+          description: The client asked for a representation other than JSON
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "429":
+          description: The GitHub API rate limit is exhausted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "502":
+          description: The GitHub API answered with an error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "504":
+          description: The GitHub API could not be reached in time
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+components:
+  schemas:
+    ApiError:
+      type: object
+      description: Representation returned by every request that fails
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: Moment the failure was rendered
+          example: 2026-01-31T10:15:30.123Z
+        status:
+          type: integer
+          format: int32
+          description: "HTTP status code, repeated for clients that only record the\
+            \ body"
+          example: 404
+        code:
+          type: string
+          description: "Stable identifier of the failure, safe to branch on"
+          enum:
+          - INVALID_REQUEST
+          - RESOURCE_NOT_FOUND
+          - USER_NOT_FOUND
+          - METHOD_NOT_ALLOWED
+          - NOT_ACCEPTABLE
+          - UPSTREAM_RATE_LIMITED
+          - UPSTREAM_ERROR
+          - UPSTREAM_UNAVAILABLE
+          - INTERNAL_ERROR
+        message:
+          type: string
+          description: Explanation meant for humans
+          example: GitHub user 'octocat' was not found
+        path:
+          type: string
+          description: Path of the request that failed
+          example: /api/v1/users/octocat/repositories
+      required:
+      - code
+      - message
+      - path
+      - status
+      - timestamp
+    Branch:
+      type: object
+      description: A branch and the commit it currently points at
+      properties:
+        name:
+          type: string
+          description: Name of the branch
+          example: main
+        lastCommitSha:
+          type: string
+          description: SHA of the last commit on the branch
+          example: 7fd1a60b01f91b314f59955a4e4d4e80d8edf11d
+      required:
+      - lastCommitSha
+      - name
+    Repository:
+      type: object
+      description: A repository owned by the requested user
+      properties:
+        name:
+          type: string
+          description: "Name of the repository, unique within the owning account"
+          example: hello-world
+        owner:
+          type: string
+          description: Login of the account that owns the repository
+          example: octocat
+        branches:
+          type: array
+          description: Every branch the repository currently has
+          items:
+            $ref: "#/components/schemas/Branch"
+      required:
+      - branches
+      - name
+      - owner
